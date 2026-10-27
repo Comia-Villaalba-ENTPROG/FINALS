@@ -10,22 +10,22 @@ using FINALS.Models;
 
 namespace FINALS.Controllers
 {
-    public class CustomersController : Controller
+    public class EquipmentController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CustomersController(ApplicationDbContext context)
+        public EquipmentController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Customers
+        // GET: Equipment
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customer.ToListAsync());
+            return View(await _context.Equipments.ToListAsync());
         }
 
-        // GET: Customers/Details/5
+        // GET: Equipment/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,39 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
+            var equipment = await _context.Equipments
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (customer == null)
+            if (equipment == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(equipment);
         }
 
-        // GET: Customers/Create
+        // GET: Equipment/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Customers/Create
+        // POST: Equipment/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Phone")] Customer customer)
+        public async Task<IActionResult> Create([Bind("Id,Name,TotalQuantity,MaxPerRequest")] Equipment equipment)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(customer);
+                _context.Add(equipment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+            return View(equipment);
         }
 
-        // GET: Customers/Edit/5
+        // GET: Equipment/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +73,22 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
+            var equipment = await _context.Equipments.FindAsync(id);
+            if (equipment == null)
             {
                 return NotFound();
             }
-            return View(customer);
+            return View(equipment);
         }
 
-        // POST: Customers/Edit/5
+        // POST: Equipment/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Phone")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TotalQuantity,MaxPerRequest")] Equipment equipment)
         {
-            if (id != customer.Id)
+            if (id != equipment.Id)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace FINALS.Controllers
             {
                 try
                 {
-                    _context.Update(customer);
+                    _context.Update(equipment);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.Id))
+                    if (!EquipmentExists(equipment.Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +113,10 @@ namespace FINALS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(customer);
+            return View(equipment);
         }
 
-        // GET: Customers/Delete/5
+        // GET: Equipment/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +124,34 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
+            var equipment = await _context.Equipments
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (customer == null)
+            if (equipment == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(equipment);
         }
 
-        // POST: Customers/Delete/5
+        // POST: Equipment/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer != null)
+            var equipment = await _context.Equipments.FindAsync(id);
+            if (equipment != null)
             {
-                _context.Customer.Remove(customer);
+                _context.Equipments.Remove(equipment);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CustomerExists(int id)
+        private bool EquipmentExists(int id)
         {
-            return _context.Customer.Any(e => e.Id == id);
+            return _context.Equipments.Any(e => e.Id == id);
         }
     }
 }
