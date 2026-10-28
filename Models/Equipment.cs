@@ -1,15 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace FINALS.Models;
-
-public class Equipment
+namespace FINALS.Models
 {
-    [Key]
-    public int Id { get; set; }
-
-    public string Name { get; set; } = ""; 
-
-    public int TotalQuantity { get; set; } 
-
-    public int MaxPerRequest { get; set;}
+    public class Equipment
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public string? Description { get; set; }
+    }
 }

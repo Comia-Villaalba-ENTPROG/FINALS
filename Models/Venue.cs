@@ -1,17 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace FINALS.Models;
-
-public class Venue
+namespace FINALS.Models
 {
-    [Key]
-    public int Id { get; set; }
-
-    public string Name { get; set; } = "";
-
-    public int Capacity { get; set; }
-
-    public string Location { get; set; } = "";
-
-    public bool IsActive { get; set; } = true;
+    public class Venue
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Location { get; set; }
+        public int Capacity { get; set; }
+    }
 }
