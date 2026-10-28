@@ -22,7 +22,7 @@ namespace FINALS.Controllers
         // GET: Organizations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Organizations.ToListAsync());
+            return View(await _context.Organization.ToListAsync());
         }
 
         // GET: Organizations/Details/5
@@ -33,7 +33,7 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
+            var organization = await _context.Organization
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (organization == null)
             {
@@ -54,7 +54,7 @@ namespace FINALS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Type,IsActive")] Organization organization)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,ContactPerson,ContactEmail")] Organization organization)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +73,7 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations.FindAsync(id);
+            var organization = await _context.Organization.FindAsync(id);
             if (organization == null)
             {
                 return NotFound();
@@ -86,7 +86,7 @@ namespace FINALS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,IsActive")] Organization organization)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ContactPerson,ContactEmail")] Organization organization)
         {
             if (id != organization.Id)
             {
@@ -124,7 +124,7 @@ namespace FINALS.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
+            var organization = await _context.Organization
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (organization == null)
             {
@@ -139,10 +139,10 @@ namespace FINALS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var organization = await _context.Organizations.FindAsync(id);
+            var organization = await _context.Organization.FindAsync(id);
             if (organization != null)
             {
-                _context.Organizations.Remove(organization);
+                _context.Organization.Remove(organization);
             }
 
             await _context.SaveChangesAsync();
@@ -151,7 +151,7 @@ namespace FINALS.Controllers
 
         private bool OrganizationExists(int id)
         {
-            return _context.Organizations.Any(e => e.Id == id);
+            return _context.Organization.Any(e => e.Id == id);
         }
     }
 }

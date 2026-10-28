@@ -6,8 +6,12 @@ namespace FINALS.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
 {
-    public DbSet<Organization> Organizations { get; set; }
-    public DbSet<Venue> Venues { get; set; }
-    public DbSet<Equipment> Equipments { get; set; }
-    public DbSet<VenueApprover> VenueApprovers { get; set; }
+
+public DbSet<FINALS.Models.Customer> Customer { get; set; } = default!;
+
+public DbSet<FINALS.Models.Organization> Organization { get; set; } = default!;
+
+public DbSet<FINALS.Models.Venue> Venue { get; set; } = default!;
+
+public DbSet<FINALS.Models.Equipment> Equipment { get; set; } = default!;
 }

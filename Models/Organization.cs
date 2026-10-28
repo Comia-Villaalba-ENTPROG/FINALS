@@ -1,16 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace FINALS.Models;
-
-public class Organization
+namespace FINALS.Models
 {
-    [Key]
-    public int Id { get; set; }
-
-    public string Name { get; set; } = "";
-
-    public string Type { get; set; } = "";
-
-    public bool IsActive { get; set; } = true; 
-
+    public class Organization
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? ContactPerson { get; set; }
+        public string? ContactEmail { get; set; }
+    }
 }
