@@ -14,4 +14,6 @@ public DbSet<FINALS.Models.Venue> Venue { get; set; } = default!;
 public DbSet<FINALS.Models.Equipment> Equipment { get; set; } = default!;
 
 public DbSet<FINALS.Models.VenueApprover> VenueApprover { get; set; } = default!;
+
+public DbSet<Reservation> Reservations { get; set; }
 }
