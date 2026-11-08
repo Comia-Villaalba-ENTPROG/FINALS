@@ -54,7 +54,7 @@ namespace FINALS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,ContactPerson,ContactEmail")] Organization organization)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Chairperson,ContactEmail")] Organization organization)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace FINALS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ContactPerson,ContactEmail")] Organization organization)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Chairperson,ContactEmail")] Organization organization)
         {
             if (id != organization.Id)
             {
