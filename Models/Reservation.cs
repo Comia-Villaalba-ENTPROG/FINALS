@@ -11,6 +11,8 @@ public class Reservation
     [Display(Name = "Tracking Number")]
     public string TrackingNumber { get; set; } = "";
 
+    public string ApprovalToken { get; set; } = "";
+
     [Required]
     [Display(Name = "Organization")]
     public int OrganizationId { get; set; }
@@ -57,6 +59,8 @@ public class Reservation
 
     [Required]
     [EmailAddress]
+    [RegularExpression(@"^[a-z0-9._%+-]+@antipolo\.benilde\.edu\.ph$",
+    ErrorMessage = "Email must be in lowercase and use the format name@antipolo.benilde.edu.ph.")]
     [Display(Name = "Email Address")]
     public string RequesterEmail { get; set; } = "";
 
@@ -74,4 +78,5 @@ public class Reservation
 
     [Display(Name = "Date Submitted")]
     public DateTime DateSubmitted { get; set; } = DateTime.Now;
+
 }

@@ -1,0 +1,93 @@
+@model FINALS.Models.Reservation
+
+@{
+    ViewData["Title"] = "Track my Reservation";
+}
+
+<h1>Track my Reservation</h1>
+
+<form asp-action="Track" method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <input type="text" name="trackingNumber" class="form-control"
+               placeholder="VRS-2026-0001" value="@Context.Request.Query["trackingNumber"]" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Track</button>
+    </div>
+</form>
+
+@if (ViewBag.NotFound != null)
+{
+    <div class="alert alert-danger">@ViewBag.NotFound</div>
+}
+
+@if (Model != null)
+{
+    <table class="table table-bordered">
+        <tr>
+            <th style="width: 30%">Tracking Number</th>
+            <td>@Model.TrackingNumber</td>
+        </tr>
+        <tr>
+            <th>Organization</th>
+            <td>@Model.Organization?.Name</td>
+        </tr>
+        <tr>
+            <th>Venue</th>
+            <td>@Model.Venue?.Name</td>
+        </tr>
+        <tr>
+            <th>Activity</th>
+            <td>@Model.ActivityName</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>@Model.ReservationDate.ToString("MMMM d, yyyy")</td>
+        </tr>
+        <tr>
+            <th>Time</th>
+            <td>@Model.StartTime.ToString("h:mm tt") to @Model.EndTime.ToString("h:mm tt")</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>
+                @if (Model.Status == "Approved")
+                {
+                    <span class="badge bg-success">Approved</span>
+                }
+                else if (Model.Status == "Rejected")
+                {
+                    <span class="badge bg-danger">Rejected</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">Pending</span>
+                }
+            </td>
+        </tr>
+    </table>
+
+        var equipment = ViewBag.Equipment as List<FINALS.Models.ReservationEquipment>;
+
+    if (equipment != null && equipment.Any())
+    {
+        <h4>Equipment Requested</h4>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:30%">Item</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in equipment)
+                {
+                    <tr>
+                        <td>@line.Equipment?.Name</td>
+                        <td>@line.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

@@ -1,0 +1,83 @@
+@model IEnumerable<FINALS.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Approvals";
+    var offices = ViewBag.Offices as Dictionary<int, string>;
+}
+
+<h1>Pending Approvals</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No reservations are waiting for approval.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tracking No.</th>
+                <th>Organization</th>
+                <th>Venue</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Waiting On</th>
+                <th>Step</th>
+                <th>Action</th>
+                <th>Approval Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TrackingNumber</td>
+                    <td>@item.Organization?.Name</td>
+                    <td>@item.Venue?.Name</td>
+                    <td>@item.ReservationDate.ToString("MMM d, yyyy")</td>
+                    <td>@item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</td>
+                    <td><strong>@offices[item.Id]</strong></td>
+                    <td>@item.CurrentStep</td>
+                    <td>
+                        <form asp-action="Approve" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form asp-action="Reject" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </td>
+                    <td>
+                        @{
+                            var link = Url.Action("ExternalApprove", "Reservations",
+                                       new { token = item.ApprovalToken }, Context.Request.Scheme);
+                        }
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" readonly value="@link" id="link-@item.Id" />
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="copyLink('link-@item.Id')">Copy</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    <script>
+        function copyLink(id) {
+            var box = document.getElementById(id);
+            box.select();
+            navigator.clipboard.writeText(box.value);
+        }
+    </script>
+}

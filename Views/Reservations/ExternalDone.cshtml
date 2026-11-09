@@ -1,0 +1,19 @@
+@model FINALS.Models.Reservation
+
+@{
+    ViewData["Title"] = "Decision Recorded";
+}
+
+<h1>Thank you</h1>
+
+<div class="alert alert-success">
+    Your decision on <strong>@Model.TrackingNumber</strong> has been recorded.
+</div>
+
+<p>
+    Venue: @Model.Venue?.Name<br />
+    Date: @Model.ReservationDate.ToString("MMMM d, yyyy")<br />
+    Current status: <strong>@Model.Status</strong>
+</p>
+
+<p>This link is now closed. No further action is needed from your office.</p>
