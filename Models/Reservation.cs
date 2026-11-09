@@ -64,9 +64,9 @@ public class Reservation
     [Display(Name = "Email Address")]
     public string RequesterEmail { get; set; } = "";
 
-    [Required]
-    [Phone]
-    [StringLength(11)]
+        [Required]
+    [RegularExpression(@"^09\d{9}$",
+        ErrorMessage = "Contact number must be 11 digits starting with 09.")]
     [Display(Name = "Contact Number")]
     public string RequesterContact { get; set; } = "";
 

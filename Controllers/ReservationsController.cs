@@ -65,14 +65,10 @@ namespace FINALS.Controllers
         // POST: Reservations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
         public async Task<IActionResult> Create(
             [Bind("OrganizationId,VenueId,ActivityName,ReservationDate,StartTime,EndTime,ExpectedAttendees,RequesterName,RequesterEmail,RequesterContact")] Reservation reservation,
             int[] equipmentIds,
             int[] quantities)
-=======
-        public async Task<IActionResult> Create([Bind("OrganizationId,VenueId,ActivityName,ReservationDate,StartTime,EndTime,ExpectedAttendees,RequesterName,RequesterEmail,RequesterContact")] Reservation reservation)
->>>>>>> 07f1d57530f0851fb26521c02b9611f5e2b04c5a
         {
             // 1. The date cannot be in the past
             if (reservation.ReservationDate < DateOnly.FromDateTime(DateTime.Now))
@@ -118,7 +114,6 @@ namespace FINALS.Controllers
                     "This venue is already reserved during that time. Please choose another slot.");
             }
 
-<<<<<<< HEAD
             // 6. Enough equipment must still be free on that date
             for (int i = 0; i < equipmentIds.Length; i++)
             {
@@ -189,27 +184,6 @@ namespace FINALS.Controllers
             ViewData["OrganizationId"] = new SelectList(_context.Organization, "Id", "Name", reservation.OrganizationId);
             ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name", reservation.VenueId);
             ViewBag.EquipmentList = _context.Equipment.OrderBy(e => e.Name).ToList();
-=======
-            if (ModelState.IsValid)
-            {
-                // Generate the tracking number
-                int count = await _context.Reservations.CountAsync() + 1;
-                reservation.TrackingNumber = "VRS-" + DateTime.Now.Year + "-" + count.ToString("D4");
-
-                reservation.Status = "Pending";
-                reservation.CurrentStep = 1;
-                reservation.DateSubmitted = DateTime.Now;
-
-                _context.Add(reservation);
-                await _context.SaveChangesAsync();
-
-                TempData["Tracking"] = reservation.TrackingNumber;
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["OrganizationId"] = new SelectList(_context.Organization, "Id", "Name", reservation.OrganizationId);
-            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name", reservation.VenueId);
->>>>>>> 07f1d57530f0851fb26521c02b9611f5e2b04c5a
             return View(reservation);
         }
 
@@ -304,28 +278,6 @@ namespace FINALS.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Reservations/Track
-        public async Task<IActionResult> Track(string? trackingNumber)
-        {
-            if (string.IsNullOrEmpty(trackingNumber))
-            {
-                return View(null);
-            }
-
-            var reservation = await _context.Reservations
-                .Include(r => r.Organization)
-                .Include(r => r.Venue)
-                .FirstOrDefaultAsync(r => r.TrackingNumber == trackingNumber);
-
-            if (reservation == null)
-            {
-                ViewBag.NotFound = "No reservation found with tracking number " + trackingNumber + ".";
-                return View(null);
-            }
-
-            return View(reservation);
         }
 
         private bool ReservationExists(int id)

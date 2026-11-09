@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Track my Reservation";
+    var equipment = ViewBag.Equipment as List<FINALS.Models.ReservationEquipment>;
 }
 
 <h1>Track my Reservation</h1>
@@ -66,11 +67,8 @@
             </td>
         </tr>
     </table>
-<<<<<<< HEAD
 
-        var equipment = ViewBag.Equipment as List<FINALS.Models.ReservationEquipment>;
-
-    if (equipment != null && equipment.Any())
+    @if (equipment != null && equipment.Any())
     {
         <h4>Equipment Requested</h4>
         <table class="table table-sm table-bordered">
@@ -91,6 +89,4 @@
             </tbody>
         </table>
     }
-=======
->>>>>>> 07f1d57530f0851fb26521c02b9611f5e2b04c5a
 }
