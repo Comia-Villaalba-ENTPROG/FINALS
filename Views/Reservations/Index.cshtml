@@ -6,102 +6,55 @@
 
 <h1>Index</h1>
 
+@if (TempData["Tracking"] != null)
+{
+    <div class="alert alert-success">
+        <strong>Reservation submitted.</strong>
+        Your tracking number is <strong>@TempData["Tracking"]</strong>.
+        Keep this to check your status later.
+    </div>
+}
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TrackingNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Organization)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Venue)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ActivityName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReservationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ExpectedAttendees)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RequesterName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RequesterEmail)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RequesterContact)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CurrentStep)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateSubmitted)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.TrackingNumber)</th>
+            <th>@Html.DisplayNameFor(model => model.Organization)</th>
+            <th>@Html.DisplayNameFor(model => model.Venue)</th>
+            <th>@Html.DisplayNameFor(model => model.ActivityName)</th>
+            <th>@Html.DisplayNameFor(model => model.ReservationDate)</th>
+            <th>@Html.DisplayNameFor(model => model.StartTime)</th>
+            <th>@Html.DisplayNameFor(model => model.EndTime)</th>
+            <th>@Html.DisplayNameFor(model => model.ExpectedAttendees)</th>
+            <th>@Html.DisplayNameFor(model => model.RequesterName)</th>
+            <th>@Html.DisplayNameFor(model => model.RequesterEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.RequesterContact)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th>@Html.DisplayNameFor(model => model.CurrentStep)</th>
+            <th>@Html.DisplayNameFor(model => model.DateSubmitted)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrackingNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Organization.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Venue.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActivityName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReservationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExpectedAttendees)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RequesterName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RequesterEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RequesterContact)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CurrentStep)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateSubmitted)
-            </td>
+            <td>@Html.DisplayFor(modelItem => item.TrackingNumber)</td>
+            <td>@Html.DisplayFor(modelItem => item.Organization.Name)</td>
+            <td>@Html.DisplayFor(modelItem => item.Venue.Name)</td>
+            <td>@Html.DisplayFor(modelItem => item.ActivityName)</td>
+            <td>@Html.DisplayFor(modelItem => item.ReservationDate)</td>
+            <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
+            <td>@Html.DisplayFor(modelItem => item.EndTime)</td>
+            <td>@Html.DisplayFor(modelItem => item.ExpectedAttendees)</td>
+            <td>@Html.DisplayFor(modelItem => item.RequesterName)</td>
+            <td>@Html.DisplayFor(modelItem => item.RequesterEmail)</td>
+            <td>@Html.DisplayFor(modelItem => item.RequesterContact)</td>
+            <td>@Html.DisplayFor(modelItem => item.Status)</td>
+            <td>@Html.DisplayFor(modelItem => item.CurrentStep)</td>
+            <td>@Html.DisplayFor(modelItem => item.DateSubmitted)</td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
