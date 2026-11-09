@@ -48,7 +48,7 @@ namespace FINALS.Controllers
         // GET: VenueApprovers/Create
         public IActionResult Create()
         {
-            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Id");
+            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace FINALS.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Id", venueApprover.VenueId);
+            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name", venueApprover.VenueId);
             return View(venueApprover);
         }
 
@@ -82,7 +82,7 @@ namespace FINALS.Controllers
             {
                 return NotFound();
             }
-            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Id", venueApprover.VenueId);
+            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name", venueApprover.VenueId);
             return View(venueApprover);
         }
 
@@ -118,7 +118,7 @@ namespace FINALS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Id", venueApprover.VenueId);
+            ViewData["VenueId"] = new SelectList(_context.Venue, "Id", "Name", venueApprover.VenueId);
             return View(venueApprover);
         }
 

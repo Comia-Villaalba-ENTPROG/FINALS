@@ -73,6 +73,10 @@ namespace FINALS.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApprovalToken")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CurrentStep")
                         .HasColumnType("INTEGER");
 
@@ -126,6 +130,30 @@ namespace FINALS.Data.Migrations
                     b.HasIndex("VenueId");
 
                     b.ToTable("Reservations");
+                });
+
+            modelBuilder.Entity("FINALS.Models.ReservationEquipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("ReservationEquipments");
                 });
 
             modelBuilder.Entity("FINALS.Models.Venue", b =>
@@ -389,6 +417,25 @@ namespace FINALS.Data.Migrations
                     b.Navigation("Organization");
 
                     b.Navigation("Venue");
+                });
+
+            modelBuilder.Entity("FINALS.Models.ReservationEquipment", b =>
+                {
+                    b.HasOne("FINALS.Models.Equipment", "Equipment")
+                        .WithMany()
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FINALS.Models.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Equipment");
+
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("FINALS.Models.VenueApprover", b =>

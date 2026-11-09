@@ -1,0 +1,57 @@
+@model FINALS.Models.Reservation
+
+@{
+    ViewData["Title"] = "Approve Reservation";
+}
+
+@if (ViewBag.Invalid != null)
+{
+    <div class="alert alert-danger">@ViewBag.Invalid</div>
+}
+else
+{
+    var equipment = ViewBag.Equipment as List<FINALS.Models.ReservationEquipment>;
+
+    <h1>Reservation Approval</h1>
+    <p>This request is waiting for <strong>@ViewBag.Office</strong>.</p>
+
+    <table class="table table-bordered">
+        <tr><th style="width:30%">Tracking Number</th><td>@Model.TrackingNumber</td></tr>
+        <tr><th>Organization</th><td>@Model.Organization?.Name</td></tr>
+        <tr><th>Venue</th><td>@Model.Venue?.Name</td></tr>
+        <tr><th>Activity</th><td>@Model.ActivityName</td></tr>
+        <tr><th>Date</th><td>@Model.ReservationDate.ToString("MMMM d, yyyy")</td></tr>
+        <tr><th>Time</th><td>@Model.StartTime.ToString("h:mm tt") to @Model.EndTime.ToString("h:mm tt")</td></tr>
+        <tr><th>Expected Attendees</th><td>@Model.ExpectedAttendees</td></tr>
+        <tr><th>Requested By</th><td>@Model.RequesterName (@Model.RequesterEmail)</td></tr>
+    </table>
+
+    if (equipment != null && equipment.Any())
+    {
+        <h4>Equipment Requested</h4>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:30%">Item</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in equipment)
+                {
+                    <tr>
+                        <td>@line.Equipment?.Name</td>
+                        <td>@line.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <form asp-action="ExternalDecision" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="token" value="@ViewBag.Token" />
+        <button type="submit" name="decision" value="Approve" class="btn btn-success">Approve</button>
+        <button type="submit" name="decision" value="Reject" class="btn btn-danger">Reject</button>
+    </form>
+}
