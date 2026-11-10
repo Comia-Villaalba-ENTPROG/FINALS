@@ -21,10 +21,26 @@ builder.Services.AddRazorPages(options =>
 });
 
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
     SeedData.Initialize(context);
+
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+
+    if (await userManager.FindByEmailAsync("gaso@antipolo.benilde.edu.ph") == null)
+    {
+        var admin = new IdentityUser();
+        admin.UserName = "gaso@antipolo.benilde.edu.ph";
+        admin.Email = "gaso@antipolo.benilde.edu.ph";
+        admin.EmailConfirmed = true;
+
+        await userManager.CreateAsync(admin, "Gaso@2026");
+    }
 }
 
 // Configure the HTTP request pipeline.
