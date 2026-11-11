@@ -487,5 +487,27 @@ namespace FINALS.Controllers
 
             return View("ExternalDone", reservation);
         }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Availability(DateOnly date)
+        {
+            var equipment = await _context.Equipment.ToListAsync();
+            var result = new List<object>();
+
+            foreach (var item in equipment)
+            {
+                int itemId = item.Id;
+
+                int alreadyUsed = await _context.ReservationEquipments
+                    .Where(re => re.EquipmentId == itemId
+                              && re.Reservation!.ReservationDate == date
+                              && re.Reservation.Status != "Rejected")
+                    .SumAsync(re => (int?)re.Quantity) ?? 0;
+
+                result.Add(new { id = item.Id, free = item.Quantity - alreadyUsed });
+            }
+
+            return Json(result);
+        }
     }
 }

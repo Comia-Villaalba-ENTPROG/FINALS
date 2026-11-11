@@ -1,66 +1,112 @@
 @model IEnumerable<FINALS.Models.Reservation>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Reservations";
 }
 
-<h1>Index</h1>
+<h1>Reservations</h1>
 
-@if (TempData["Tracking"] != null)
-{
-    <div class="alert alert-success">
-        <strong>Reservation submitted.</strong>
-        Your tracking number is <strong>@TempData["Tracking"]</strong>.
-        Keep this to check your status later.
+<div class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input type="text" id="searchBox" class="form-control"
+               placeholder="Search tracking number, organization or venue"
+               oninput="filterTable()" />
     </div>
-}
+    <div class="col-md-3">
+        <select id="statusFilter" class="form-select" onchange="filterTable()">
+            <option value="">All statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+    <div class="col-md-3 d-flex align-items-center">
+        <span id="rowCount" class="text-muted"></span>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table table-bordered" id="reservationTable">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.TrackingNumber)</th>
-            <th>@Html.DisplayNameFor(model => model.Organization)</th>
-            <th>@Html.DisplayNameFor(model => model.Venue)</th>
-            <th>@Html.DisplayNameFor(model => model.ActivityName)</th>
-            <th>@Html.DisplayNameFor(model => model.ReservationDate)</th>
-            <th>@Html.DisplayNameFor(model => model.StartTime)</th>
-            <th>@Html.DisplayNameFor(model => model.EndTime)</th>
-            <th>@Html.DisplayNameFor(model => model.ExpectedAttendees)</th>
-            <th>@Html.DisplayNameFor(model => model.RequesterName)</th>
-            <th>@Html.DisplayNameFor(model => model.RequesterEmail)</th>
-            <th>@Html.DisplayNameFor(model => model.RequesterContact)</th>
-            <th>@Html.DisplayNameFor(model => model.Status)</th>
-            <th>@Html.DisplayNameFor(model => model.CurrentStep)</th>
-            <th>@Html.DisplayNameFor(model => model.DateSubmitted)</th>
+            <th>Tracking No.</th>
+            <th>Organization</th>
+            <th>Venue</th>
+            <th>Activity</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Step</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@Html.DisplayFor(modelItem => item.TrackingNumber)</td>
-            <td>@Html.DisplayFor(modelItem => item.Organization.Name)</td>
-            <td>@Html.DisplayFor(modelItem => item.Venue.Name)</td>
-            <td>@Html.DisplayFor(modelItem => item.ActivityName)</td>
-            <td>@Html.DisplayFor(modelItem => item.ReservationDate)</td>
-            <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
-            <td>@Html.DisplayFor(modelItem => item.EndTime)</td>
-            <td>@Html.DisplayFor(modelItem => item.ExpectedAttendees)</td>
-            <td>@Html.DisplayFor(modelItem => item.RequesterName)</td>
-            <td>@Html.DisplayFor(modelItem => item.RequesterEmail)</td>
-            <td>@Html.DisplayFor(modelItem => item.RequesterContact)</td>
-            <td>@Html.DisplayFor(modelItem => item.Status)</td>
-            <td>@Html.DisplayFor(modelItem => item.CurrentStep)</td>
-            <td>@Html.DisplayFor(modelItem => item.DateSubmitted)</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr data-status="@item.Status"
+                data-search="@((item.TrackingNumber + " " + item.Organization?.Name + " " + item.Venue?.Name).ToLower())">
+                <td>@item.TrackingNumber</td>
+                <td>@item.Organization?.Name</td>
+                <td>@item.Venue?.Name</td>
+                <td>@item.ActivityName</td>
+                <td>@item.ReservationDate.ToString("MMM d, yyyy")</td>
+                <td>@item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</td>
+                <td>
+                    @if (item.Status == "Approved")
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else if (item.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger">Rejected</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    }
+                </td>
+                <td>@item.CurrentStep</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        function filterTable() {
+            var search = document.getElementById("searchBox").value.toLowerCase();
+            var status = document.getElementById("statusFilter").value;
+            var rows = document.querySelectorAll("#reservationTable tbody tr");
+
+            var shown = 0;
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+
+                var text = row.getAttribute("data-search");
+                var rowStatus = row.getAttribute("data-status");
+
+                var matchesSearch = text.indexOf(search) !== -1;
+                var matchesStatus = (status === "" || status === rowStatus);
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = "";
+                    shown = shown + 1;
+                }
+                else {
+                    row.style.display = "none";
+                }
+            }
+
+            document.getElementById("rowCount").textContent =
+                shown + " of " + rows.length + " reservations";
+        }
+
+        // Show the count as soon as the page opens
+        filterTable();
+    </script>
+}

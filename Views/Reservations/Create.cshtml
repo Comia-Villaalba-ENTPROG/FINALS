@@ -4,23 +4,24 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Reservation</h4>
+<h1>Make a Reservation</h1>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="OrganizationId" class="control-label"></label>
-                <select asp-for="OrganizationId" class ="form-control" asp-items="ViewBag.OrganizationId"></select>
+                <select asp-for="OrganizationId" class="form-control" asp-items="ViewBag.OrganizationId"></select>
+                <span asp-validation-for="OrganizationId" class="text-danger"></span>
             </div>
             <div class="form-group">
-    <label asp-for="VenueId" class="control-label"></label>
-    <select asp-for="VenueId" class="form-control" asp-items="ViewBag.VenueId"></select>
-    <span asp-validation-for="VenueId" class="text-danger"></span>
-</div>
+                <label asp-for="VenueId" class="control-label"></label>
+                <select asp-for="VenueId" class="form-control" asp-items="ViewBag.VenueId"></select>
+                <span asp-validation-for="VenueId" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="ActivityName" class="control-label"></label>
                 <input asp-for="ActivityName" class="form-control" />
@@ -61,43 +62,83 @@
                 <input asp-for="RequesterContact" class="form-control" />
                 <span asp-validation-for="RequesterContact" class="text-danger"></span>
             </div>
-            <hr />
-<h4>Equipment Requested</h4>
-<p class="text-muted">Leave the quantity at 0 for items you do not need.</p>
 
-<table class="table table-sm table-bordered">
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Available</th>
-            <th style="width:120px">Quantity</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var e in (List<FINALS.Models.Equipment>)ViewBag.EquipmentList)
-        {
-            <tr>
-                <td>@e.Name</td>
-                <td>@e.Quantity</td>
-                <td>
-                    <input type="hidden" name="equipmentIds" value="@e.Id" />
-                    <input type="number" name="quantities" value="0" min="0" class="form-control form-control-sm" />
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <hr />
+            <h4>Equipment Requested</h4>
+            <p class="text-muted">Leave the quantity at 0 for items you do not need.</p>
+
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Available</th>
+                        <th style="width:120px">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in (List<FINALS.Models.Equipment>)ViewBag.EquipmentList)
+                    {
+                        <tr>
+                            <td>@e.Name</td>
+                            <td id="avail-@e.Id">@e.Quantity</td>
+                            <td>
+                                <input type="hidden" name="equipmentIds" value="@e.Id" />
+                                <input type="number" name="quantities" value="0" min="0" class="form-control form-control-sm" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <p class="text-muted" id="availNote">Pick a date to see what is actually available.</p>
+
+            <div class="form-group mb-4">
+                <input type="submit" value="Submit Reservation" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function loadAvailability() {
+            var dateBox = document.getElementById("ReservationDate");
+            var date = dateBox.value;
+
+            if (date === "") {
+                return;
+            }
+
+            fetch("/Reservations/Availability?date=" + date)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var cell = document.getElementById("avail-" + data[i].id);
+
+                        if (cell) {
+                            cell.textContent = data[i].free;
+
+                            if (data[i].free === 0) {
+                                cell.className = "text-danger fw-bold";
+                            }
+                            else {
+                                cell.className = "";
+                            }
+                        }
+                    }
+
+                    document.getElementById("availNote").textContent =
+                        "Showing what is still free on " + date + ".";
+                });
+        }
+
+        document.getElementById("ReservationDate").addEventListener("change", loadAvailability);
+
+        // In case the form came back with a date already filled in after a validation error
+        loadAvailability();
+    </script>
 }
