@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FINALS.Data;
 using FINALS.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FINALS.Controllers
 {
+    [Authorize]
     public class VenuesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +21,9 @@ namespace FINALS.Controllers
             _context = context;
         }
 
+       
         // GET: Venues
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Venue.ToListAsync());

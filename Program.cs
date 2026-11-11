@@ -20,6 +20,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeAreaPage("Identity", "/Account/Register");
 });
 
+builder.Services.AddHttpClient();   
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
