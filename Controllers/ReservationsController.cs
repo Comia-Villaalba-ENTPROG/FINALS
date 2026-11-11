@@ -11,13 +11,16 @@ using FINALS.Models;
 
 namespace FINALS.Controllers
 {
+    [Authorize]
     public class ReservationsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly HttpClient _http;
 
-        public ReservationsController(ApplicationDbContext context)
+        public ReservationsController(ApplicationDbContext context, IHttpClientFactory httpFactory)
         {
             _context = context;
+            _http = httpFactory.CreateClient();
         }
 
         // GET: Reservations
@@ -54,6 +57,7 @@ namespace FINALS.Controllers
         }
 
         // GET: Reservations/Create
+        [AllowAnonymous]
         public IActionResult Create()
         {
             ViewData["OrganizationId"] = new SelectList(_context.Organization, "Id", "Name");
@@ -64,6 +68,7 @@ namespace FINALS.Controllers
 
         // POST: Reservations/Create
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("OrganizationId,VenueId,ActivityName,ReservationDate,StartTime,EndTime,ExpectedAttendees,RequesterName,RequesterEmail,RequesterContact")] Reservation reservation,
@@ -146,6 +151,29 @@ namespace FINALS.Controllers
                 }
             }
 
+             try
+            {
+                int year = reservation.ReservationDate.Year;
+                var url = "https://date.nager.at/api/v3/PublicHolidays/" + year + "/PH";
+
+                var holidays = await _http.GetFromJsonAsync<List<Holiday>>(url) ?? new List<Holiday>();
+
+                foreach (var holiday in holidays)
+                {
+                    if (holiday.Date == reservation.ReservationDate)
+                    {
+                        ModelState.AddModelError("ReservationDate",
+                            "The school is closed on " + holiday.Date.ToString("MMMM d") +
+                            ", " + holiday.LocalName + " (" + holiday.Name + "). Please choose another date.");
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+
             if (ModelState.IsValid)
             {
                 // Generate the tracking number
@@ -177,8 +205,7 @@ namespace FINALS.Controllers
 
                 await _context.SaveChangesAsync();
 
-                TempData["Tracking"] = reservation.TrackingNumber;
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Track", new { trackingNumber = reservation.TrackingNumber });
             }
 
             ViewData["OrganizationId"] = new SelectList(_context.Organization, "Id", "Name", reservation.OrganizationId);
@@ -286,6 +313,7 @@ namespace FINALS.Controllers
         }
 
         // GET: Reservations/Track
+        [AllowAnonymous]
         public async Task<IActionResult> Track(string? trackingNumber)
         {
             if (string.IsNullOrEmpty(trackingNumber))
@@ -313,7 +341,7 @@ namespace FINALS.Controllers
         }
 
         // GET: Reservations/Approvals
-        [Authorize]
+        
         public async Task<IActionResult> Approvals()
         {
             var pending = await _context.Reservations
@@ -340,7 +368,6 @@ namespace FINALS.Controllers
 
         // POST: Reservations/Approve/5
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
         {
@@ -362,7 +389,6 @@ namespace FINALS.Controllers
 
         // POST: Reservations/Reject/5
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
         {
