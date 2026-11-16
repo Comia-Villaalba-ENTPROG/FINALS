@@ -18,4 +18,6 @@ public DbSet<FINALS.Models.VenueApprover> VenueApprover { get; set; } = default!
 public DbSet<Reservation> Reservations { get; set; }
 
 public DbSet<ReservationEquipment> ReservationEquipments { get; set; }
+
+public DbSet<SchoolClosure> SchoolClosures { get; set; }
 }

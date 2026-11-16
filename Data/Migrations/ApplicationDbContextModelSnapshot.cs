@@ -94,7 +94,6 @@ namespace FINALS.Data.Migrations
 
                     b.Property<string>("RequesterContact")
                         .IsRequired()
-                        .HasMaxLength(11)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RequesterEmail")
@@ -154,6 +153,28 @@ namespace FINALS.Data.Migrations
                     b.HasIndex("ReservationId");
 
                     b.ToTable("ReservationEquipments");
+                });
+
+            modelBuilder.Entity("FINALS.Models.SchoolClosure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SchoolClosures");
                 });
 
             modelBuilder.Entity("FINALS.Models.Venue", b =>

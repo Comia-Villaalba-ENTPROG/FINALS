@@ -1,9 +1,90 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero text-center">
+    <h1 class="display-5">Venue Reservation System</h1>
+    <p class="lead mb-1">De La Salle-College of Saint Benilde Antipolo</p>
+    <p class="text-muted">
+        Reserve a school venue online. No account needed.
+    </p>
+
+    <div class="mt-4">
+        <a class="btn btn-brand btn-lg me-2" asp-controller="Reservations" asp-action="Create">
+            Make a Reservation
+        </a>
+        <a class="btn btn-outline-brand btn-lg" asp-controller="Reservations" asp-action="Track">
+            Track my Reservation
+        </a>
+    </div>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <p class="mt-4 mb-0">
+            <a asp-controller="Reservations" asp-action="Approvals">Go to pending approvals</a>
+        </p>
+    }
 </div>
 
+<h3 class="section-title">How it works</h3>
+
+<div class="row g-3 mb-5">
+    <div class="col-md-3">
+        <div class="step-card h-100">
+            <div class="step-num">1</div>
+            <h5>Submit</h5>
+            <p>Choose your organization, venue, date and the equipment you need, then send the request.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="step-card h-100">
+            <div class="step-num">2</div>
+            <h5>Automatic checks</h5>
+            <p>The system confirms the venue is free, large enough for your group, and that the date is not a holiday.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="step-card h-100">
+            <div class="step-num">3</div>
+            <h5>Office approval</h5>
+            <p>Each approving office is emailed in turn and signs off online. No walking from office to office.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="step-card h-100">
+            <div class="step-num">4</div>
+            <h5>Track</h5>
+            <p>Keep your tracking number and check the status at any time, without signing in.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h5>Reservation hours</h5>
+            <p class="mb-0">
+                7:30 AM to 5:00 PM. Activities beyond these hours carry an additional cost per hour,
+                arranged directly with GASO.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h5>Venues</h5>
+            <p class="mb-0">
+                Benilde Hall, Chapel, Lobby, Function Hall, GYM A, GYM B and GYM C.
+                <a asp-controller="Venues" asp-action="Index">See capacities</a>
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h5>Equipment</h5>
+            <p class="mb-0">
+                Chairs, tables, stage platforms, plants, flag poles and a podium.
+                <a asp-controller="Equipment" asp-action="Index">See what is on file</a>
+            </p>
+        </div>
+    </div>
+</div>

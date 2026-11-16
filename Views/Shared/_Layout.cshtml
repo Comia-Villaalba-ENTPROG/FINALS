@@ -11,7 +11,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-brand box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FINALS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -23,35 +23,38 @@
 
                         @* Everyone sees these *@
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Venues" asp-action="Index">Venues</a>
+                            <a class="nav-link" asp-area="" asp-controller="Venues" asp-action="Index">Venues</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Equipment" asp-action="Index">Equipment</a>
+                            <a class="nav-link" asp-area="" asp-controller="Equipment" asp-action="Index">Equipment</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Create">Make a Reservation</a>
+                            <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Create">Make a Reservation</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Track">Track my Reservation</a>
+                            <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Track">Track my Reservation</a>
+                        </li>
+                        <li class="nav-item">
+                             <a class="nav-link" asp-area="" asp-controller="SchoolClosures" asp-action="Index">School Calendar</a>
                         </li>
 
                         @* Only signed-in offices see these *@
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Organizations" asp-action="Index">Organizations</a>
+                                <a class="nav-link" asp-area="" asp-controller="Organizations" asp-action="Index">Organizations</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="VenueApprovers" asp-action="Index">Approving Offices</a>
+                                <a class="nav-link" asp-area="" asp-controller="VenueApprovers" asp-action="Index">Approving Offices</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Index">Reservations</a>
+                                <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Index">Reservations</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Approvals">Approvals</a>
+                                <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Approvals">Approvals</a>
                             </li>
                         }
                     </ul>

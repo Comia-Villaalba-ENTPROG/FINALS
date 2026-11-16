@@ -1,0 +1,47 @@
+@model IEnumerable<FINALS.Models.SchoolClosure>
+
+@{
+    ViewData["Title"] = "School Calendar";
+}
+
+<h1>School Calendar</h1>
+<p class="text-muted">Venues cannot be reserved on these dates.</p>
+
+@if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Reason</th>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(c => c.StartDate))
+        {
+            <tr>
+                <td>@item.StartDate.ToString("MMMM d, yyyy")</td>
+                <td>@item.EndDate.ToString("MMMM d, yyyy")</td>
+                <td>@item.Reason</td>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

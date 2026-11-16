@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FINALS.Data;
 using FINALS.Models;
+using FINALS.Services;
 
 namespace FINALS.Controllers
 {
@@ -16,11 +17,13 @@ namespace FINALS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _http;
+        private readonly EmailSender _email;
 
-        public ReservationsController(ApplicationDbContext context, IHttpClientFactory httpFactory)
+        public ReservationsController(ApplicationDbContext context, IHttpClientFactory httpFactory, EmailSender email)
         {
             _context = context;
             _http = httpFactory.CreateClient();
+            _email = email;
         }
 
         // GET: Reservations
@@ -151,7 +154,8 @@ namespace FINALS.Controllers
                 }
             }
 
-             try
+            // 7. The school is closed on Philippine public holidays
+            try
             {
                 int year = reservation.ReservationDate.Year;
                 var url = "https://date.nager.at/api/v3/PublicHolidays/" + year + "/PH";
@@ -171,7 +175,19 @@ namespace FINALS.Controllers
             }
             catch (Exception)
             {
-                
+                // If the holiday website is down, let the booking through rather than
+                // blocking students because of a problem on someone else's server.
+            }
+                        
+            // 8. The school calendar may close the campus on dates the API does not know about
+            var closure = await _context.SchoolClosures
+                .FirstOrDefaultAsync(c => c.StartDate <= reservation.ReservationDate
+                                       && reservation.ReservationDate <= c.EndDate);
+
+            if (closure != null)
+            {
+                ModelState.AddModelError("ReservationDate",
+                    "The school is closed on that date: " + closure.Reason + ".");
             }
 
             if (ModelState.IsValid)
@@ -204,6 +220,9 @@ namespace FINALS.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Email the first approving office
+                await NotifyApprover(reservation);
 
                 return RedirectToAction("Track", new { trackingNumber = reservation.TrackingNumber });
             }
@@ -316,15 +335,17 @@ namespace FINALS.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Track(string? trackingNumber)
         {
-            if (string.IsNullOrEmpty(trackingNumber))
+            if (string.IsNullOrWhiteSpace(trackingNumber))
             {
                 return View((Reservation?)null);
             }
 
+            trackingNumber = trackingNumber.Trim();
+
             var reservation = await _context.Reservations
                 .Include(r => r.Organization)
                 .Include(r => r.Venue)
-                .FirstOrDefaultAsync(r => r.TrackingNumber == trackingNumber);
+                .FirstOrDefaultAsync(r => r.TrackingNumber.ToUpper() == trackingNumber.ToUpper());
 
             if (reservation == null)
             {
@@ -341,7 +362,6 @@ namespace FINALS.Controllers
         }
 
         // GET: Reservations/Approvals
-        
         public async Task<IActionResult> Approvals()
         {
             var pending = await _context.Reservations
@@ -426,6 +446,64 @@ namespace FINALS.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            // Email the next office in the chain. Does nothing once fully approved,
+            // because the token has been cleared.
+            await NotifyApprover(reservation);
+        }
+
+        // Emails the office whose turn it is, with the approval link inside
+        private async Task NotifyApprover(Reservation reservation)
+        {
+            if (string.IsNullOrEmpty(reservation.ApprovalToken))
+            {
+                return;   // nothing left to approve
+            }
+
+            var approver = await _context.VenueApprover
+                .FirstOrDefaultAsync(a => a.VenueId == reservation.VenueId
+                                       && a.StepOrder == reservation.CurrentStep);
+
+            if (approver == null || string.IsNullOrEmpty(approver.Email))
+            {
+                return;   // no office on file for this step
+            }
+
+            var venue = await _context.Venue.FindAsync(reservation.VenueId);
+            var organization = await _context.Organization.FindAsync(reservation.OrganizationId);
+
+            string link = Url.Action("ExternalApprove", "Reservations",
+                new { token = reservation.ApprovalToken }, Request.Scheme) ?? "";
+
+            string subject = "Venue reservation for your approval - " + reservation.TrackingNumber;
+
+            string body =
+                "<p>Good day " + approver.Office + ",</p>" +
+                "<p>A venue reservation is waiting for your approval.</p>" +
+                "<table border='1' cellpadding='6' cellspacing='0'>" +
+                "<tr><td><b>Tracking Number</b></td><td>" + reservation.TrackingNumber + "</td></tr>" +
+                "<tr><td><b>Organization</b></td><td>" + (organization != null ? organization.Name : "") + "</td></tr>" +
+                "<tr><td><b>Venue</b></td><td>" + (venue != null ? venue.Name : "") + "</td></tr>" +
+                "<tr><td><b>Activity</b></td><td>" + reservation.ActivityName + "</td></tr>" +
+                "<tr><td><b>Date</b></td><td>" + reservation.ReservationDate.ToString("MMMM d, yyyy") + "</td></tr>" +
+                "<tr><td><b>Time</b></td><td>" + reservation.StartTime.ToString("h:mm tt") +
+                    " to " + reservation.EndTime.ToString("h:mm tt") + "</td></tr>" +
+                "<tr><td><b>Expected Attendees</b></td><td>" + reservation.ExpectedAttendees + "</td></tr>" +
+                "<tr><td><b>Requested By</b></td><td>" + reservation.RequesterName +
+                    " (" + reservation.RequesterEmail + ")</td></tr>" +
+                "</table>" +
+                "<p><a href='" + link + "'>Click here to review and approve this reservation</a></p>" +
+                "<p>This link can only be used once. Please do not forward it.</p>";
+
+            try
+            {
+                await _email.SendAsync(approver.Email, subject, body);
+            }
+            catch (Exception)
+            {
+                // If the mail server is unreachable the reservation is still saved,
+                // and GASO can approve from the Approvals page instead.
+            }
         }
 
         // GET: Reservations/ExternalApprove?token=xxxx
@@ -488,6 +566,8 @@ namespace FINALS.Controllers
             return View("ExternalDone", reservation);
         }
 
+        // GET: Reservations/Availability?date=2026-12-20
+        // Returns how many of each equipment item are still free on that date, as JSON
         [AllowAnonymous]
         public async Task<IActionResult> Availability(DateOnly date)
         {

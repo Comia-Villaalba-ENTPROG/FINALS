@@ -29,3 +29,131 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* ---- Benilde colours ---- */
+:root {
+    --brand: #3d6b35;
+    --brand-dark: #2d4f27;
+    --brand-light: #eef3ec;
+}
+
+/* ---- navbar ---- */
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: .3px;
+}
+
+.navbar.bg-brand {
+    background-color: var(--brand) !important;
+    border-bottom: 3px solid var(--brand-dark) !important;
+}
+
+.navbar.bg-brand .navbar-brand,
+.navbar.bg-brand .nav-link {
+    color: #ffffff !important;
+}
+
+.navbar.bg-brand .nav-link:hover {
+    color: #d9e6d4 !important;
+}
+
+/* ---- buttons ---- */
+.btn-brand {
+    background-color: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.btn-brand:hover {
+    background-color: var(--brand-dark);
+    border-color: var(--brand-dark);
+    color: #fff;
+}
+
+.btn-outline-brand {
+    border-color: var(--brand);
+    color: var(--brand);
+    background-color: #fff;
+}
+
+.btn-outline-brand:hover {
+    background-color: var(--brand);
+    color: #fff;
+}
+
+/* ---- home page ---- */
+.hero {
+    background: var(--brand-light);
+    border: 1px solid #dde6da;
+    border-radius: .5rem;
+    padding: 48px 24px;
+    margin-bottom: 40px;
+}
+
+.hero h1 {
+    color: var(--brand-dark);
+    font-weight: 600;
+}
+
+.section-title {
+    color: var(--brand-dark);
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.step-card {
+    border: 1px solid #e3e3e3;
+    border-radius: .5rem;
+    padding: 20px 18px;
+    background: #fff;
+}
+
+.step-card h5 {
+    color: var(--brand-dark);
+    margin-bottom: 8px;
+}
+
+.step-card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 0;
+}
+
+.step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.info-card {
+    border-left: 4px solid var(--brand);
+    background: #fafafa;
+    border-radius: .25rem;
+    padding: 18px;
+}
+
+.info-card h5 {
+    color: var(--brand-dark);
+    font-size: 17px;
+}
+
+.info-card p {
+    font-size: 14px;
+    color: #555;
+}
+
+/* ---- tables ---- */
+.table thead tr {
+    background-color: var(--brand-light);
+}
+
+.table thead th {
+    color: var(--brand-dark);
+}
