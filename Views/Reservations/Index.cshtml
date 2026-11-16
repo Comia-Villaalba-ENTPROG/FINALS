@@ -4,16 +4,16 @@
     ViewData["Title"] = "Reservations";
 }
 
-<h1>Reservations</h1>
+<h1 class="mb-3">Reservations</h1>
 
-<div class="row g-2 mb-3">
+<div class="row g-2 mb-4">
     <div class="col-md-6">
         <input type="text" id="searchBox" class="form-control"
                placeholder="Search tracking number, organization or venue"
-               oninput="filterTable()" />
+               oninput="filterCards()" />
     </div>
     <div class="col-md-3">
-        <select id="statusFilter" class="form-select" onchange="filterTable()">
+        <select id="statusFilter" class="form-select" onchange="filterCards()">
             <option value="">All statuses</option>
             <option value="Pending">Pending</option>
             <option value="Approved">Approved</option>
@@ -25,32 +25,15 @@
     </div>
 </div>
 
-<table class="table table-bordered" id="reservationTable">
-    <thead>
-        <tr>
-            <th>Tracking No.</th>
-            <th>Organization</th>
-            <th>Venue</th>
-            <th>Activity</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Step</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr data-status="@item.Status"
-                data-search="@((item.TrackingNumber + " " + item.Organization?.Name + " " + item.Venue?.Name).ToLower())">
-                <td>@item.TrackingNumber</td>
-                <td>@item.Organization?.Name</td>
-                <td>@item.Venue?.Name</td>
-                <td>@item.ActivityName</td>
-                <td>@item.ReservationDate.ToString("MMM d, yyyy")</td>
-                <td>@item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</td>
-                <td>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="reservationCards">
+    @foreach (var item in Model)
+    {
+        <div class="col reservation-card"
+             data-status="@item.Status"
+             data-search="@((item.TrackingNumber + " " + item.Organization?.Name + " " + item.Venue?.Name).ToLower())">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <strong>@item.TrackingNumber</strong>
                     @if (item.Status == "Approved")
                     {
                         <span class="badge bg-success">Approved</span>
@@ -63,50 +46,57 @@
                     {
                         <span class="badge bg-warning text-dark">Pending</span>
                     }
-                </td>
-                <td>@item.CurrentStep</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@item.ActivityName</h5>
+                    <p class="card-text mb-1"><strong>Organization:</strong> @item.Organization?.Name</p>
+                    <p class="card-text mb-1"><strong>Venue:</strong> @item.Venue?.Name</p>
+                    <p class="card-text mb-1"><strong>Date:</strong> @item.ReservationDate.ToString("MMM d, yyyy")</p>
+                    <p class="card-text mb-1"><strong>Time:</strong> @item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</p>
+                    <p class="card-text text-muted mb-0">Step @item.CurrentStep</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @section Scripts {
     <script>
-        function filterTable() {
+        function filterCards() {
             var search = document.getElementById("searchBox").value.toLowerCase();
             var status = document.getElementById("statusFilter").value;
-            var rows = document.querySelectorAll("#reservationTable tbody tr");
+            var cards = document.querySelectorAll("#reservationCards .reservation-card");
 
             var shown = 0;
 
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
 
-                var text = row.getAttribute("data-search");
-                var rowStatus = row.getAttribute("data-status");
+                var text = card.getAttribute("data-search");
+                var cardStatus = card.getAttribute("data-status");
 
                 var matchesSearch = text.indexOf(search) !== -1;
-                var matchesStatus = (status === "" || status === rowStatus);
+                var matchesStatus = (status === "" || status === cardStatus);
 
                 if (matchesSearch && matchesStatus) {
-                    row.style.display = "";
+                    card.style.display = "";
                     shown = shown + 1;
                 }
                 else {
-                    row.style.display = "none";
+                    card.style.display = "none";
                 }
             }
 
             document.getElementById("rowCount").textContent =
-                shown + " of " + rows.length + " reservations";
+                shown + " of " + cards.length + " reservations";
         }
 
         // Show the count as soon as the page opens
-        filterTable();
+        filterCards();
     </script>
 }

@@ -5,7 +5,7 @@
     var offices = ViewBag.Offices as Dictionary<int, string>;
 }
 
-<h1>Pending Approvals</h1>
+<h1 class="mb-3">Pending Approvals</h1>
 
 @if (TempData["Message"] != null)
 {
@@ -18,32 +18,33 @@
 }
 else
 {
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Tracking No.</th>
-                <th>Organization</th>
-                <th>Venue</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Waiting On</th>
-                <th>Step</th>
-                <th>Action</th>
-                <th>Approval Link</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.TrackingNumber</td>
-                    <td>@item.Organization?.Name</td>
-                    <td>@item.Venue?.Name</td>
-                    <td>@item.ReservationDate.ToString("MMM d, yyyy")</td>
-                    <td>@item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</td>
-                    <td><strong>@offices[item.Id]</strong></td>
-                    <td>@item.CurrentStep</td>
-                    <td>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var item in Model)
+        {
+            var link = Url.Action("ExternalApprove", "Reservations",
+                       new { token = item.ApprovalToken }, Context.Request.Scheme);
+
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <strong>@item.TrackingNumber</strong>
+                        <span class="badge bg-warning text-dark">Step @item.CurrentStep</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-1"><strong>Organization:</strong> @item.Organization?.Name</p>
+                        <p class="card-text mb-1"><strong>Venue:</strong> @item.Venue?.Name</p>
+                        <p class="card-text mb-1"><strong>Date:</strong> @item.ReservationDate.ToString("MMM d, yyyy")</p>
+                        <p class="card-text mb-3"><strong>Time:</strong> @item.StartTime.ToString("h:mm tt") to @item.EndTime.ToString("h:mm tt")</p>
+                        <p class="card-text mb-3"><strong>Waiting on:</strong> <span class="badge bg-primary">@offices[item.Id]</span></p>
+
+                        <label class="form-label small text-muted mb-1">Approval link</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" readonly value="@link" id="link-@item.Id" />
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="copyLink('link-@item.Id')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
                         <form asp-action="Approve" method="post" style="display:inline">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />
@@ -54,22 +55,11 @@ else
                             <input type="hidden" name="id" value="@item.Id" />
                             <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                         </form>
-                    </td>
-                    <td>
-                        @{
-                            var link = Url.Action("ExternalApprove", "Reservations",
-                                       new { token = item.ApprovalToken }, Context.Request.Scheme);
-                        }
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" readonly value="@link" id="link-@item.Id" />
-                            <button class="btn btn-outline-secondary" type="button"
-                                    onclick="copyLink('link-@item.Id')">Copy</button>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 @section Scripts {
