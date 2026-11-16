@@ -178,6 +178,17 @@ namespace FINALS.Controllers
                 // If the holiday website is down, let the booking through rather than
                 // blocking students because of a problem on someone else's server.
             }
+                        
+            // 8. The school calendar may close the campus on dates the API does not know about
+            var closure = await _context.SchoolClosures
+                .FirstOrDefaultAsync(c => c.StartDate <= reservation.ReservationDate
+                                       && reservation.ReservationDate <= c.EndDate);
+
+            if (closure != null)
+            {
+                ModelState.AddModelError("ReservationDate",
+                    "The school is closed on that date: " + closure.Reason + ".");
+            }
 
             if (ModelState.IsValid)
             {
