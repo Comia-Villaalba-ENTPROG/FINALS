@@ -21,6 +21,7 @@ builder.Services.AddRazorPages(options =>
 });
 
 builder.Services.AddHttpClient();   
+builder.Services.AddTransient<FINALS.Services.EmailSender>();
 
 var app = builder.Build();
 
