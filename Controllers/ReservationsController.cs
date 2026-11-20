@@ -358,8 +358,13 @@ namespace FINALS.Controllers
                 .Where(re => re.ReservationId == reservation.Id)
                 .ToListAsync();
 
+            ViewBag.TotalSteps = await _context.VenueApprover
+                .CountAsync(a => a.VenueId == reservation.VenueId);
+
             return View(reservation);
         }
+
+        
 
         // GET: Reservations/Approvals
         public async Task<IActionResult> Approvals()
