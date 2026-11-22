@@ -24,6 +24,42 @@
 
 @if (Model != null)
 {
+    int totalSteps = ViewBag.TotalSteps is int t && t > 0 ? t : 1;
+    int step = Model.CurrentStep;
+    int percent;
+    string barColor;
+    string label;
+
+    if (Model.Status == "Approved")
+    {
+        percent = 100;
+        barColor = "bg-success";
+        label = "All approvals complete";
+    }
+    else if (Model.Status == "Rejected")
+    {
+        percent = 100;
+        barColor = "bg-danger";
+        label = "Request was rejected";
+    }
+    else
+    {
+        percent = Math.Max(5, Math.Min(100, (int)((step - 1) * 100.0 / totalSteps)));
+        barColor = "bg-warning";
+        label = "Waiting for approval: step " + step + " of " + totalSteps;
+    }
+
+    <div class="mb-4">
+        <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>@label</span>
+            <span>@percent%</span>
+        </div>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar @barColor" role="progressbar" style="width: @percent%"
+                 aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <tr>
             <th style="width: 30%">Tracking Number</th>

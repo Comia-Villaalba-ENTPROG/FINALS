@@ -4,13 +4,27 @@
     ViewData["Title"] = "Venues";
 }
 
-<h1 class="mb-4">Venues</h1>
+<h1 class="mb-3">Venues</h1>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<div class="row mb-4">
+    <div class="col-md-6">
+        <input type="text" id="venueSearch" class="form-control"
+               placeholder="Search venue or location" oninput="filterVenues()" />
+    </div>
+    <div class="col-md-3 d-flex align-items-center">
+        <span id="venueCount" class="text-muted small"></span>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="venueCards">
     @foreach (var item in Model)
     {
-        <div class="col">
+        var imageName = item.Name.ToLower().Replace(" ", "-");
+        <div class="col venue-card" data-search="@((item.Name + " " + item.Location).ToLower())">
             <div class="card h-100 shadow-sm">
+                <img src="~/images/venues/@(imageName).jpg" class="card-img-top"
+                     alt="@item.Name" style="height:180px; object-fit:cover;"
+                     onerror="this.style.display='none'" />
                 <div class="card-body">
                     <h5 class="card-title">@item.Name</h5>
                     <p class="card-text text-muted mb-1">@item.Location</p>
@@ -20,3 +34,27 @@
         </div>
     }
 </div>
+
+<p id="noResults" class="text-muted mt-4" style="display:none;">No venues match your search.</p>
+
+@section Scripts {
+    <script>
+        function filterVenues() {
+            var search = document.getElementById("venueSearch").value.toLowerCase();
+            var cards = document.querySelectorAll("#venueCards .venue-card");
+            var shown = 0;
+
+            for (var i = 0; i < cards.length; i++) {
+                var match = cards[i].getAttribute("data-search").indexOf(search) !== -1;
+                cards[i].style.display = match ? "" : "none";
+                if (match) { shown++; }
+            }
+
+            document.getElementById("venueCount").textContent =
+                shown + " of " + cards.length + " venues";
+            document.getElementById("noResults").style.display = shown === 0 ? "" : "none";
+        }
+
+        filterVenues();
+    </script>
+}

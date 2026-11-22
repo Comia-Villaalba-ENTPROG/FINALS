@@ -7,12 +7,12 @@
 <h1 class="mb-3">Reservations</h1>
 
 <div class="row g-2 mb-4">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <input type="text" id="searchBox" class="form-control"
                placeholder="Search tracking number, organization or venue"
                oninput="filterCards()" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <select id="statusFilter" class="form-select" onchange="filterCards()">
             <option value="">All statuses</option>
             <option value="Pending">Pending</option>
@@ -20,8 +20,18 @@
             <option value="Rejected">Rejected</option>
         </select>
     </div>
-    <div class="col-md-3 d-flex align-items-center">
-        <span id="rowCount" class="text-muted"></span>
+    <div class="col-md-3">
+        <select id="dateFilter" class="form-select" onchange="filterCards()">
+            <option value="">All dates</option>
+            <option value="today">Today</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+        <span id="rowCount" class="text-muted small"></span>
     </div>
 </div>
 
@@ -30,6 +40,7 @@
     {
         <div class="col reservation-card"
              data-status="@item.Status"
+             data-date="@item.ReservationDate.ToString("yyyy-MM-dd")"
              data-search="@((item.TrackingNumber + " " + item.Organization?.Name + " " + item.Venue?.Name).ToLower())">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -67,27 +78,55 @@
 
 @section Scripts {
     <script>
+        function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+        function toStr(d) {
+            return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+        }
+
+        function matchesDate(filter, dateStr) {
+            if (filter === "") { return true; }
+
+            var now = new Date();
+            var today = toStr(now);
+
+            if (filter === "today") { return dateStr === today; }
+            if (filter === "upcoming") { return dateStr >= today; }
+            if (filter === "past") { return dateStr < today; }
+
+            if (filter === "week") {
+                var start = new Date(now);
+                start.setDate(now.getDate() - now.getDay());
+                var end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return dateStr >= toStr(start) && dateStr <= toStr(end);
+            }
+
+            if (filter === "month") {
+                return dateStr.substring(0, 7) === today.substring(0, 7);
+            }
+
+            return true;
+        }
+
         function filterCards() {
             var search = document.getElementById("searchBox").value.toLowerCase();
             var status = document.getElementById("statusFilter").value;
+            var dateFilter = document.getElementById("dateFilter").value;
             var cards = document.querySelectorAll("#reservationCards .reservation-card");
-
             var shown = 0;
 
             for (var i = 0; i < cards.length; i++) {
                 var card = cards[i];
 
-                var text = card.getAttribute("data-search");
-                var cardStatus = card.getAttribute("data-status");
+                var okSearch = card.getAttribute("data-search").indexOf(search) !== -1;
+                var okStatus = (status === "" || status === card.getAttribute("data-status"));
+                var okDate = matchesDate(dateFilter, card.getAttribute("data-date"));
 
-                var matchesSearch = text.indexOf(search) !== -1;
-                var matchesStatus = (status === "" || status === cardStatus);
-
-                if (matchesSearch && matchesStatus) {
+                if (okSearch && okStatus && okDate) {
                     card.style.display = "";
-                    shown = shown + 1;
-                }
-                else {
+                    shown++;
+                } else {
                     card.style.display = "none";
                 }
             }
@@ -96,7 +135,6 @@
                 shown + " of " + cards.length + " reservations";
         }
 
-        // Show the count as soon as the page opens
         filterCards();
     </script>
 }
