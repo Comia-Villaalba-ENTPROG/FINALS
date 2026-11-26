@@ -42,7 +42,9 @@ using (var scope = app.Services.CreateScope())
         admin.Email = "gaso@antipolo.benilde.edu.ph";
         admin.EmailConfirmed = true;
 
-        await userManager.CreateAsync(admin, "Gaso@2026");
+        string adminPassword = builder.Configuration["Gaso:Password"]
+        ?? throw new InvalidOperationException(
+        "Gaso:Password is not configured.");
     }
 }
 
