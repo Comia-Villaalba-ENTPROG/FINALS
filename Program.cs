@@ -35,16 +35,24 @@ using (var scope = app.Services.CreateScope())
 
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-    if (await userManager.FindByEmailAsync("gaso@antipolo.benilde.edu.ph") == null)
+    string adminPassword = builder.Configuration["Gaso:Password"]
+        ?? throw new InvalidOperationException("Gaso:Password is not configured.");
+
+    var admin = await userManager.FindByEmailAsync("gaso@antipolo.benilde.edu.ph");
+
+    if (admin == null)
     {
-        var admin = new IdentityUser();
+        admin = new IdentityUser();
         admin.UserName = "gaso@antipolo.benilde.edu.ph";
         admin.Email = "gaso@antipolo.benilde.edu.ph";
         admin.EmailConfirmed = true;
 
-        string adminPassword = builder.Configuration["Gaso:Password"]
-        ?? throw new InvalidOperationException(
-        "Gaso:Password is not configured.");
+        await userManager.CreateAsync(admin, adminPassword);
+    }
+    else
+    {
+        var token = await userManager.GeneratePasswordResetTokenAsync(admin);
+        await userManager.ResetPasswordAsync(admin, token, adminPassword);
     }
 }
 
